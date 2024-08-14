@@ -30,6 +30,62 @@ int Game::startGame() {
     return 0;
 }
 
+//Getters
+const int& Game::getBalance() const {
+    return _balance;
+}
+
+const int& Game::getQuota() const {
+    return _quota;
+}
+
+const int& Game::getCargoValue() const {
+    return _cargoValue;
+}
+
+const ItemManager* Game::getItemManager() const {
+    return _itemManager;
+}
+
+const int& Game::getAliveEmployees() const {
+    return _aliveEmployees;
+}
+
+const int& Game::getDay() const {
+    return _day;
+}
+
+const int& Game::getRemainingDays() const {
+    return _remainingDays;
+}
+
+const AbstractMoon& Game::getCurrentMoon() const {
+    return *_currentMoon;
+}
+
+RandomGenerator& Game::getRandomGenerator() const {
+    return *_randomGenerator;
+}
+
+
+//Setters 
+
+void Game::setAliveEmployees(const int& numOfEmployees) {
+    _aliveEmployees = numOfEmployees;
+}
+
+void Game::setBalance(const int& updatedBalance)  {
+    _balance = updatedBalance;
+}
+
+void Game::setCargoValue(const int& updatedCargoValue) {
+    _cargoValue = updatedCargoValue;
+}
+
+void Game::setCurrentMoon(AbstractMoon* newMoon)  {
+    _currentMoon = newMoon;
+}
+
 
 void Game::exit() {
     std::cout << "\nTill next time..Byee!\n\n" << std::endl;

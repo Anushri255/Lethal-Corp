@@ -30,6 +30,7 @@ int Game::startGame() {
     return 0;
 }
 
+
 //Getters
 const int& Game::getBalance() const {
     return _balance;
@@ -118,6 +119,122 @@ void Game::welcomeString() const {
     std::cout << DEADLY_CORP_TITLE << std::endl;
     std::cout << "Welcome! \nWe trust you will be a great asset to the corporation!\n" << std::endl;
 }
+
+void Game::landOnMoon() {
+    std::cout << "\n\nWELCOME to " << _currentMoon->name() << "!\n" << std::endl;
+    std::cout << "Current cargo value: $" << _cargoValue << std::endl;
+    std::cout << "Current balance: $" << _balance << std::endl;
+    std::cout << "Current quota: $" << _quota << " (" << _remainingDays << " days left to meet quota)" << std::endl;
+    std::cout << "Number of employees: " << _aliveEmployees << std::endl;
+
+    if (_currentMoon->name() != "Corporation") {
+        std::cout << "\nType SEND followed by the number of employees you wish to send inside the facility. All the other employees will stay on the ship. " << std::endl;
+  
+    } else {
+        std::cout << "\nType SELL to sell your cargo contents and increase your balance and achieve quota." << std::endl;
+        std::cout << "Specify the amount to sell after the SELL word to only sell a portion of your cargo." << std::endl;
+    }
+    std::cout << "Type LEAVE to leave the planet." << std::endl;
+
+    _gamePhase = "Landed";
+
+}
+
+void Game::leaveMoon() {
+    _day++;
+    _moonManager->setMoonsWeather(*this);
+    _remainingDays--;
+    std::cout << "\n\n\n";
+    _gamePhase = "Orbiting";
+    _aliveEmployees = 4;
+
+    if (_day % 4 == 1) {
+        
+        if (_balance >= _quota) {
+            _quota = _quota + (_quota * 0.50);
+            _remainingDays = 3;
+            std::cout << "\n\n-------------------------------------" << std::endl;
+            std::cout << "CONGRATULATIONS ON MAKING QUOTA!" << std::endl;
+            std::cout << "New quota: $" << _quota << std::endl;
+            std::cout << "-------------------------------------\n\n" << std::endl;
+            _currentMoon->onDayBegin(*this);
+        
+        } else {
+            std::cout << "\n\n------------------------------------" << std::endl;
+            std::cout << ">>>>>>>>>>>>> GAME OVER <<<<<<<<<<<<" << std::endl;
+            std::cout << "------------------------------------\n" << std::endl;
+            std::cout << "You did not meet quota in time, and your employees have been fired." << std::endl;
+            std::cout << "You kept them alive for " << _day - 1 << " days." << std::endl;
+            _endGame = true;
+            exit();
+
+        }
+    
+    } else {
+        _currentMoon->onDayBegin(*this);
+    }
+    
+}
+
+void Game::setupGame() {
+
+
+    AbstractMoon* moon = new CorporationMoon("Corporation");
+    _moonManager->registerMoon(moon);
+
+    moon = new RegularMoons("Prototyping", 3, 30, 0.50);
+    _moonManager->registerMoon(moon);
+
+    moon = new RegularMoons("Insurance",5,50,0.45);
+    _moonManager->registerMoon(moon);
+
+    moon = new RegularMoons("Pledge", 30, 50, 0.40);
+    _moonManager->registerMoon(moon);
+
+    moon = new RegularMoons("Defence",10,70,0.35);
+    _moonManager->registerMoon(moon);
+
+    moon = new RegularMoons("April", 20, 120, 0.30,500);
+    _moonManager->registerMoon(moon);
+
+    moon = new RegularMoons("Tore", 100, 130, 0.25, 700);
+    _moonManager->registerMoon(moon);
+
+    moon = new RegularMoons("Hyperion", 100, 150, 0.20, 900);
+    _moonManager->registerMoon(moon);
+
+    for (AbstractMoon* moon : _moonManager->getMoonsList()) {
+        if (moon->name() == "Corporation") {
+            _currentMoon = moon;
+            break;
+        }    
+    }
+  
+    Item* item = new Item("Flashlight", 60, 1,1.05, 1, 0, 0.5);
+    _itemManager->registerItem(item);
+
+    item = new Item("Shovel", 100, 1, 1.05, 1, 0, 0.5);
+    _itemManager->registerItem(item);
+
+    item = new Item("Pro-flashlight", 200, 1, 1.10, 1, 0, 0.5);
+    _itemManager->registerItem(item);
+
+    item = new Item("Teleporter", 300, 1, 1, 1, 0.33, 0.5);
+    _itemManager->registerItem(item);
+
+    item = new Item("Inverse-teleporter", 400, 1.10, 0.8, 1, 0, 0.5);
+    _itemManager->registerItem(item);
+
+    item = new Item("Backpack", 500, 1, 1, 1, 0, 1.25);
+    _itemManager->registerItem(item);
+
+    item = new Item("Hydraulics Mk2", 1000, 1, 1, 1.25, 0, 0.5);
+    _itemManager->registerItem(item);
+
+    _moonManager->setMoonsWeather(*this);
+
+}
+
 
 bool Game::processCommand(const std::string& userCommand, std::vector<std::string>& args) {
 
